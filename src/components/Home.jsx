@@ -93,7 +93,7 @@ const Home = () => {
     };
 
     fetchWeatherDataAndUser();
-  }, [cityNotFound]);
+  }, [cityNotFound, getWeatherData, getGraphData, setCity]);
 
   // Message Handler
   const handleButtonClick = () => {
@@ -218,9 +218,7 @@ const Home = () => {
   // handele propile navigation
   const handleProfile = () => {
     setLoading(true);
-    {
-      localStorage.getItem("token") ? navigate("/profile") : navigate("/login");
-    }
+    localStorage.getItem("token") ? navigate("/profile") : navigate("/login");
     setLoading(false);
   };
 

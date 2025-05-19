@@ -1,5 +1,5 @@
 import axios from "axios";
-import { createContext, useState, useContext, useEffect } from "react";
+import { createContext, useState, useContext, useEffect, useCallback } from "react";
 
 // Create the context
 const DataContext = createContext();
@@ -16,7 +16,7 @@ export const DataProvider = ({ children }) => {
   const [cityNotFound, setCityNotFound] = useState(false);
 
   // === Get weather data (with optional city override) ===
-  const getWeatherData = async (cityNameParam = null) => {
+  const getWeatherData = useCallback(async (cityNameParam = null) => {
     try {
       const storedUser = JSON.parse(localStorage.getItem("user"));
       const userCity = storedUser?.city;
@@ -42,10 +42,10 @@ export const DataProvider = ({ children }) => {
       }
       console.error("Error fetching weather data:", error);
     }
-  };
+  }, [city]);
 
   // === Get graph data (with optional city override) ===
-  const getGraphData = async (cityNameParam = null) => {
+  const getGraphData = useCallback(async (cityNameParam = null) => {
     try {
       const finalCity = cityNameParam?.trim() || city?.trim() || "pune";
 
@@ -67,10 +67,10 @@ export const DataProvider = ({ children }) => {
     } catch (err) {
       console.error("Error fetching graph data:", err);
     }
-  };
+  }, [city]);
 
   // === Get weather data by coordinates ===
-  const getWeatherDataByCoords = async (latitude, longitude) => {
+  const getWeatherDataByCoords = useCallback(async (latitude, longitude) => {
     try {
       if (!latitude || !longitude) {
         throw new Error("Invalid latitude or longitude");
@@ -88,10 +88,10 @@ export const DataProvider = ({ children }) => {
         error.message
       );
     }
-  };
+  }, []);
 
   // === Get graph data by coordinates ===
-  const getGraphDataByCoords = async (latitude, longitude) => {
+  const getGraphDataByCoords = useCallback(async (latitude, longitude) => {
     try {
       if (!latitude || !longitude) {
         throw new Error("Invalid latitude or longitude");
@@ -113,7 +113,7 @@ export const DataProvider = ({ children }) => {
         err.message
       );
     }
-  };
+  }, []);
 
   // Auto-fetch on city change
   useEffect(() => {
@@ -121,8 +121,7 @@ export const DataProvider = ({ children }) => {
       getWeatherData();
       getGraphData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [city]);
+  }, [city, getWeatherData, getGraphData]);
 
   return (
     <DataContext.Provider
